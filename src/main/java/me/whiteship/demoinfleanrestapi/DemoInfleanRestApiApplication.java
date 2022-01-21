@@ -8,6 +8,8 @@ public class DemoInfleanRestApiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoInfleanRestApiApplication.class, args);
+		var a = 0;
+
 	}
 
 }
