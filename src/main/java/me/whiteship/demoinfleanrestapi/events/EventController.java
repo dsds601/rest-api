@@ -1,8 +1,10 @@
 package me.whiteship.demoinfleanrestapi.events;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.mvc.JacksonSerializers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -27,6 +29,7 @@ public class EventController {
 
     private final EventValidator eventValidator;
 
+    private final ObjectMapper objectMapper;
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
         if (errors.hasErrors()){
@@ -35,7 +38,7 @@ public class EventController {
 
         eventValidator.validate(eventDto,errors);
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         Event event = modelMapper.map(eventDto,Event.class);

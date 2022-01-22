@@ -109,14 +109,18 @@ public class EventControllerTest {
                 .closeEnrollmentDateTime(LocalDateTime.of(2021,02,21,17,10))
                 .beginEventDateTime(LocalDateTime.of(2021,02,26,17,10))
                 .endEventDateTime(LocalDateTime.of(2021,02,24,18,10))
-                .basePrice(10000)
+                .basePrice(100000)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트 팩토리")
                 .build();
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(eventDto))
-        ).andExpect(status().isBadRequest());
+                .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].ObjectName").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists());
     }
 }
