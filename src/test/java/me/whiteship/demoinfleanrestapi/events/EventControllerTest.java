@@ -43,13 +43,13 @@ public class EventControllerTest {
                 .beginEventDateTime(LocalDateTime.of(2021,02,22,17,10))
                 .endEventDateTime(LocalDateTime.of(2021,02,24,18,10))
                 .basePrice(100)
-                .maxPrice(200)
+                .maxPrice(210)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트 팩토리")
                 .build();
 
         mockMvc.perform(post("/api/events/")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
@@ -59,7 +59,10 @@ public class EventControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
-                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists());
     }
 
     @Test
@@ -82,7 +85,7 @@ public class EventControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/events/")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
@@ -94,7 +97,7 @@ public class EventControllerTest {
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
         EventDto eventDto = EventDto.builder().build();
         this.mockMvc.perform(post("/api/events")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(this.objectMapper.writeValueAsString(eventDto))
                 ).andExpect(status().isBadRequest());
     }
@@ -115,7 +118,7 @@ public class EventControllerTest {
                 .location("강남역 D2 스타트 팩토리")
                 .build();
         this.mockMvc.perform(post("/api/events")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())

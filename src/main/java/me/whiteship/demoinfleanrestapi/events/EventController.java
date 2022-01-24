@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.JacksonSerializers;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -38,13 +40,17 @@ public class EventController {
 
         eventValidator.validate(eventDto,errors);
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON_UTF8).body(errors);
         }
 
         Event event = modelMapper.map(eventDto,Event.class);
         event.update();
         Event newEvent = eventRepository.save(event);
-        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        return ResponseEntity.created(createdUri).body(event);
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createdUri = selfLinkBuilder.toUri();
+        EventResource eventResource = new EventResource(event);
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        eventResource.add(selfLinkBuilder.withRel("update-event"));
+        return ResponseEntity.created(createdUri).contentType(MediaTypes.HAL_JSON).body(eventResource);
     }
 }
