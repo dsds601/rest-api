@@ -42,7 +42,7 @@ public class Event {
         if(this.location == null||this.location.isBlank()){
             this.offline = false;
         } else {
-
+            this.offline = true;
         }
     }
 }
