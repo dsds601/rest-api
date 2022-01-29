@@ -19,7 +19,5 @@ public class EventValidator {
         || endEventDateTime.isBefore(eventDto.getBeginEnrollmentDateTime())){
             errors.rejectValue("endEventDateTime","wrongValue","endEventDateTime is Wrong");
         }
-
-
     }
 }
